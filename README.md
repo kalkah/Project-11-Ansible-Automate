@@ -1,7 +1,33 @@
 # Project-11-Ansible-Automate
 ## Ansible Configuration Management
 
-This project is 3-in-1 Project, further automation is built on the NFS server with installation of Jenkins, Ansible, and Load balancer.
+The project will show how deploying Ansible will help to simplify complex tasks and streamline IT infastructure. We will also work with Jenkins to configure and execute build jobs whilst writing code using declarative language such as YAML. This project is 3-in-1 Project, further automation is built on the NFS server with installation of Jenkins, Ansible, and Load balancer.
+
+## Introduction to Ansible Configuration Management
+
+The goal of this project is to demonstrate Ansible's powerful automation capabilities. Ansible is an open source, command line software application that is used for automating IT operations such as deploying applications, managing configurations scaling infrastructure and other activities involving many repetitive tasks. Ansible's main strengths are simplicity and ease of use. It lets IT professionals quickly and easily deploy multi tier apps. Rather than needing to write lengthy code to automate our systems, we simply list the tasks that require automation by writing a Playbook and Ansible figures out how to get our systems to the state we need them to be in. It is also important to note Ansible has a strong focus on security and reliability and as such it has very minimal moving parts. A great exapmle of this is that Ansible is agentless. This means that the devices or infrastructure it monitors do not require any proprietary software agent to be installed on them beforehand. Ansible has two major types of files:
+
+1. The Ansible inventory file defines the hosts and groups of hosts upon which commands, modules, and tasks in a playbook operate.
+
+2. Ansible Playbooks are lists of tasks that are automatically executed for the specified inventory or groups of hosts. One or more Ansible tasks can be combined to make a play — an ordered grouping of tasks mapped to specific hosts—and tasks are executed in the order in which they are written.
+
+![image](https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/88c661ea-d5dc-46b4-aa38-d91fb1d98f2d)
+
+## Ansible as Jump Server
+
+A Jump Server (sometimes also referred as Bastion Host) is an intermediary server through which access to internal network can be provided. If you think about the current architecture we are working on, ideally, the webservers would be inside a secured network which cannot be reached directly from the Internet. That means, even DevOps engineers cannot SSH into the Web servers directly and can only access it through a Jump Server – it provides better security and reduces attack surface.
+
+On the diagram below, the Virtual Private Network (VPC) is divided into two subnets – Public subnet has public IP addresses and Private subnet is only reachable by private IP addresses.
+
+![image](https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/d3ba010c-3420-4f9e-b34f-ef9f5095795a)
+
+Further on in our future projects, we will implement a proper Bastion Host. But for now, we will make do with developing Ansible scripts to simulate the use of a Jump Box/Bastion Host to access our Web Servers. Therefore, based on the infrastructure to be used and the goal of this project, it shall consist of three parts:
+
+1. Install and Set-up Jenkins on EC2 Instance.
+
+2. Install and Configure Ansible to act as a Jump Server/Bastion Host.
+
+3. Begin Ansible Development, Set up an Inventory and Create a Simple Ansible Playbook to Automate Server Configuration.
 
 The final architecture is shown below:
 
@@ -85,4 +111,14 @@ The script run successfully
 The `/etc/hosts` file was updated  for local DNS with Web Servers names (e.g. Webserver1 and Webserver2) and their local IP addresses.
 
 <img width="669" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/798035d5-3780-455c-bb84-6ee39675474f">
+
+### Jenkins Installation
+
+Jenkins is an open-source automation tool written in Java with plugins built for continuous integration. Jenkins is used to build and test software projects continuously making it easier for developers to integrate changes to the project, and making it easier for users to obtain a fresh build. It also allows developers to continuously deliver software by integrating with a large number of testing and deployment technologies. We deploy Jenkins by implementing the following steps:
+
+An EC2 instance was launched using the free tier eligible version of Ubuntu Linux Server 22.04 LTS (HVM). The server was named Jenkins-Ansible server
+
+Port 8080 was opened in the security group inbounds rules to allow traffic from anywhere. Jenkins uses TCP Port 8080 by default.
+
+Elastic IP address was created and allocated to the Jenkins-Ansible server: Considering that we'll be using Jenkins with Github and configuring Web Hooks in this project, it will make our job easier to create and allocate an elastic IP adress to our Jenkins-Ansible Server. This is beacuse everytime we stop/start the server, there will be a need to keep reconfiguring Github Web Hooks to a new IP address. Having an elastic IP address (which will not change when we stop/start the server) is the ideal way to overcome this issue.
 
