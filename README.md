@@ -244,4 +244,54 @@ Under "Content type", we select "application/json"
 
 <img width="944" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/b9254339-bdc3-4fab-b00d-958b49912cfd">
 
+In Jenkins, on the `ansible` project page, click on configure, under "Build Triggers", we check the box for "GitHub hook trigger for GITScm polling"
+
+<img width="880" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/3efd23fc-6d21-4623-bd53-8b5a495b6ad2">
+
+Next to ensure Jenkins saves all files also known as "Build Artifacts", we go under Post-build Actions, we click on Add post-build Action and we select "Archive the artifacts"
+
+<img width="947" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/3472ab9b-57bb-4175-9cb5-a22144d6a908">
+
+In the dialogue box under "Files to archive", we simply enter ** which refers to all available paths in the working space. Then we click on "Apply" and "Save" at the bottom of the page.
+
+<img width="950" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/99fbc1d6-db8b-485f-ad19-2ff42769b149">
+
+To test the above set up, some changes were made to the README.md file in our ansible-config-mgt GitHub repository.
+
+<img width="958" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/af50c5f6-b366-4e93-b5c4-bd7dcef1e634">
+
+The build started automatically and Jenkins saved the files (build artifacts).The following commands were used to further confirm this:
+
+`ls /var/lib/jenkins/jobs/ansible/builds/3/archive/`        `sudo cat /var/lib/jenkins/jobs/ansible/builds/3/archive/README.md`
+
+<img width="635" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/ee2eb3c3-cd12-49f1-a7e0-b91a504f82e8">
+
+**Configure Jenkins to Connect and Copy Files to NFS Server**
+
+In this step, we will proceed to configure Jenkins to connect via SSH and copy files to the `/mnt/opt` directory in the NFS server we deployed for the Tooling Website Solution. To begin this implementation, we will require a plugin called "Publish Over SSH". We install this by clicking on the "Manage Jenkins", under the System configuration page, click on "Plugins" and search for "Publish Over SSH". ckick on "Install"
+
+<img width="960" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/9d23bafa-fb41-44c4-a7fd-5af1307e63a9">
+
+We configure the "Publish Over SSH" plugin and our ansible job/project to copy our build artifacts to the NFS server. On the Jenkins Dashboard click on the "Manage Jenkins", under the System configuration page, click on "System". scroll down to "Publish Over SSH" configuration section
+
+<img width="935" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/a86eafea-59f5-4679-878e-44ecf7bad000">
+
+Under "Key", we put in the content of .pem file that we used in connecting to to the NFS server via SSH.
+
+<img width="865" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/37b251d9-e0c2-4246-86c4-8073e9c7c3a2">
+
+We need to input configuration more configuration to enable connection to the NFS Server. Under "SSH Servers", we click on the "Add" button and then we input the following:
+
+Name: This can be any arbitrary name.
+
+Hostname: This will be the private IP address of the NFS server (172.31.28.109).
+
+Username: For this we will use `ec2-user` which is the username used for Red Hat Enterprise Linux based servers such as our NFS Server.
+
+Remote directory: Here, we will use the `/mnt/opt` directory which we specified we will be using for Jenkins in our Tooling Website Solution project.
+
+Next is to test the configuration and ensure the connection returns "Success". We should note that TCP Port 22 on our NFS server must be open to receive SSH connections. Then clikc on "Apply" and "Save"
+
+<img width="794" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/68448699-839f-4e33-9a57-1b583b589fb8">
+
 
