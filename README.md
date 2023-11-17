@@ -429,4 +429,88 @@ vi. Then we update our inventory/dev.yml file with the following lines of code:
 ```
 <img width="710" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/4c22890d-0e89-44ca-b8ed-a9b509ab47fe">
 
+**Step 3: Create a Common Playbook**
+
+Ansible Playbooks are lists of tasks that automatically execute for a specified inventory or groups of hosts. Now we proceed to give Ansible the instructions on what we need to be performed on all servers listed in `inventory/dev`. 
+
+In the `common.yml` playbook, we will write configuration for repeatable, re-usable, and multi-machine tasks that are common to systems within the infrastructure. We begin by updating our playbooks/common.yml file with following code:
+```
+---
+- name: update web, nfs and db servers
+  hosts: webservers, nfs, db
+  become: yes
+  tasks:
+    - name: ensure wireshark is at the latest version
+      yum:
+        name: wireshark
+        state: latest
+   
+
+- name: update LB server
+  hosts: lb
+  become: yes
+  tasks:
+    - name: Update apt repo
+      apt: 
+        update_cache: yes
+
+    - name: ensure wireshark is at the latest version
+      apt:
+        name: wireshark
+        state: latest
+```
+
+The code as seen in the playbook image above is divided into two parts with each of them intended to perform the same task: install **wireshark** utility (or make sure it is updated to the latest version) on our RHEL 8 (Web, NFS) and Ubuntu (LB, DB) servers. It uses **root** user to perform this task and respective package manager: `yum` for RHEL 8 and `apt` for Ubuntu.
+<img width="724" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/0db5dfb7-2501-4cea-b6cf-4adfcec474ae">
+
+**Step 4: Update GIT with latest Code**
+At this point, our directories and files are on our local machine so we need to push all the changes we made locally to Github.
+
+i. We use the following commands to add commit and push our branch to GitHub:
+```
+git status
+
+git add <selected files> (git add common.yml)
+
+git commit -m "commit message"
+
+```
+<img width="716" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/b3a9179a-b4b5-4d75-ab07-b14f623d5ad3">
+
+ii. The next thing we do is to create a Pull Request in GitHub by following [these steps.](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request):
+
+From the ansible-config-mgt repository page, we click on the "Pull requests" tab and then in the next page we click on the "New pull request" button. This takes us to the "Compare changes" page where we choose the **new-feature** branch to set up a comparison with the **main** branch.
+<img width="944" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/5bb45e8b-d7cd-415c-8c81-d74324f2b2a7">
+
+iv. As we are satisfied and happy with the changes made in new-feature, we click on "Merge pull request" and then we click on "Confirm merge"
+
+v. This takes us to the next page which shows that new-feature has been successfully merged to main branch
+<img width="944" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/ec6dc8ae-94aa-40d3-9ea5-f51ab2aee69c">
+
+vi. Now we head back to the terminal, and we checkout from the new-feature branch into the main branch, and then we pull down the latest changes.
+
+`git checkout main`        `git pull`
+<img width="709" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/359d6d80-083d-4101-9a90-9a8346e3bcbc">
+<img width="723" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/ebcb19ab-3c8b-4c13-834b-d1d1c5b61025">
+
+vii. As seen in the image below, once our code changes appear in the `main` branch, Jenkins does its job and saves all the build artifacts (files) to` /var/lib/jenkins/jobs/ansible/builds/<build_number>/archive/` directory on the `Jenkins-Ansible` server.
+<img width="949" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/c4e95240-f221-4243-a126-bfa21a9494e5">
+
+viii. For further confirmation we go to the terminal for the Jenkins-Ansible server and we enter the following commands:
+
+`$ sudo ls /var/lib/jenkins/jobs/ansible/builds/4/archive/playbooks`
+
+`$ sudo cat /var/lib/jenkins/jobs/ansible/builds/4/archive/playbooks/common.yml`
+
+`$ sudo ls /var/lib/jenkins/jobs/ansible/builds/4/archive/inventory`
+
+`$ sudo cat /var/lib/jenkins/jobs/ansible/builds/4/archive/inventory/dev.yml`
+
+<img width="659" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/48a6d6a1-a43f-43a3-9993-cb901160cc5b">
+<img width="662" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/a10a3a1e-df56-4d10-a5a0-60f14129076c">
+
+**Step 5: Run First Ansible Test**
+Now, it is time to execute the ansible-playbook command and verify if our playbook actually works. We proceed by implementing the following steps:
+
+i. We connect to our Jenkins-Ansible server via VScode:    `$ ssh -A ubuntu@13.49.9.69`
 
