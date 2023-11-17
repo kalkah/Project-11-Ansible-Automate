@@ -100,7 +100,7 @@ sudo nginx -t
 sudo systemctl restart nginx
 ```
 
-The permission of the file was chnaged with the command below to make it executable: `sudo chmod +x nginx-install.sh`
+The permission of the file was changed with the command below to make it executable: `sudo chmod +x nginx-install.sh`
 
 The script was run using this command: `./nginx-install.sh 51.20.79.124 13.53.214.97:8000 51.20.133.184:8000`  (./nginx-install.sh PUBLIC_IP nginxloadbalancer Webserver-1 Webserver-2)
 
@@ -108,9 +108,58 @@ The script run successfully
 
 <img width="659" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/74e4e07a-58e6-4c42-9cc6-01bdc03e16d5">
 
+ open the Nginx configuration file with the following command:    `sudo nano /etc/nginx/conf.d/loadbalancer.conf'
+
+We copy and paste in the configuration file below to configure nginx to act as a load balancer. As can be seen in the file, necessary information like Public IP and Port Number for our three web servers are provided. We also need to provide the Public IP address of our Nginx Load Balancer.
+```
+        upstream backend_servers {
+
+            # your are to replace the public IP and Port to that of your webservers
+            server 51.20.82.142:80; # public IP and port for webserver 1
+            server 51.20.131.231:80; # public IP and port for webserver 2
+            server 51.20.122.38:80; # public IP and port for webserver 3
+
+        }
+
+        server {
+            listen 8080;
+            server_name 51.20.190.36; # provide your load balancers public IP address
+
+            location / {
+                proxy_pass http://backend_servers;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            }
+        }
+```
+
+<img width="662" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/dbdbc8f4-3f37-416a-acda-ea360c842a72">
+
+The following serves to break down the configuration file above and explain in more detail:
+
+    upstream backend_servers defines a group of back end servers (our two web servers).
+
+    The server lines inside the upstream block lists the ports and public IP addresses of both of our backend webservers.
+
+    proxy_pass inside the location block sets up the load balancing, passing the request to the back end servers.
+
+    The proxy_set_header lines pass necessary headers to the backend servers to correctly haandle the requests.
+
+The command `sudo nginx -t` was used to test our configuration:
+
+<img width="401" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/a9b6814d-d209-4dea-956e-a718b74bd074">
+
 The `/etc/hosts` file was updated  for local DNS with Web Servers names (e.g. Webserver1 and Webserver2) and their local IP addresses.
 
 <img width="669" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/798035d5-3780-455c-bb84-6ee39675474f">
+
+we execute the following command `sudo systemctl restart nginx`to restart the Nginx service and load our new configuration.
+
+Paste in the public IP address of our Nginx loadbalancer (syntax is: http://<Public-IP-Address>:8080) into the browser: **http://51.20.79.124**
+<img width="958" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/dc415e6e-4a31-41f3-814e-517bfcd3b964">
+
+As shown in the image above, our load balancer is able to serve content from the tooling website on our web servers.
 
 ### Jenkins Installation
 
@@ -293,5 +342,91 @@ Remote directory: Here, we will use the `/mnt/opt` directory which we specified 
 Next is to test the configuration and ensure the connection returns "Success". We should note that TCP Port 22 on our NFS server must be open to receive SSH connections. Then clikc on "Apply" and "Save"
 
 <img width="794" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/68448699-839f-4e33-9a57-1b583b589fb8">
+
+### Prepare Development Enviroment
+
+The first part of "DevOps" is "Dev", which means we will be required to write some codes and to make coding and debugging comfortable, we will need an Integrated development environment (IDE) or Source-code Editor. There is a plethora of different IDEs and Source-code Editors for different languages with their own advantages and drawbacks. We however decided to use one free and universal editor that will fully satisfy our needs – Visual Studio Code (VSC).
+
+ VSC was opened and configured to connect to our newly created GitHub repository that we named ansible-config-mgt using the following steps:
+
+On the left hand pane we click on "Source Control", click on the "Clone Repository" button and under the search bar, we click on "Clone from Github". This takes us to our browser and we get a prompt to log into our GitHub account so we click on "Sign in"
+
+<img width="960" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/f392e6a4-40de-4177-8bc2-973c325560b9">
+
+<img width="947" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/2cefb565-282f-4db9-9dfe-cd4a52c56441">
+
+This prompts us to select a folder to use as the repository destination. So we create a folder for our repo and select it.
+<img width="467" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/37c07925-b1a7-4abe-b539-9beda7880746">
+
+Then we get a dialogue box to open the cloned repository.
+<img width="960" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/ad540190-aa92-4bcf-bb50-aaf764e0f914">
+
+As we can see in the image below, the ansible-config-mgt repository has been cloned to VS Code
+<img width="959" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/be0a8509-4a46-4900-b830-8e3adf3e4a71">
+
+Next, we clone down the ansible-config-mgt repository to our Jenkins-Ansible instance with the following command:    `git clone <ansible-config-mgt repo link>`
+
+`git clone https://github.com/kalkah/Ansible-config-mgt.git`
+<img width="554" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/234b3d0e-271b-4272-b65c-cdae5b830bff">
+
+### Begin Ansible Development, Set up an Inventory and Create a Simple Ansible Playbook to Automate Server Configuration
+
+**Step 1: Begin Ansible Development**
+i. To begin Ansible development we go to our ansible-config-mgt GitHub repository in VS Code and we create a new branch new-feature that will be used for development of a new feature. We do this by following the steps below:
+
+From the VS Code environment we go to the bottom of the page and we click on main. Next, under the dialogue box, we select "Create new branch from.." and we choose main. Then we subsequently click on the "Publish Branch" button. Afterwards, we enter the new branch name new-feature and we press Enter.
+<img width="959" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/70cee24d-ebf6-4fe2-b614-8a6a8c97b941">
+
+ii. we enter the command below to checkout the newly created branch new-feature to our local machine and start building our code and directory structure:
+
+`git checkout new-feature` 
+<img width="721" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/f2df6b95-6e83-404e-bc88-8da92497ad01">
+
+iiI. We use the following command to create a directory that will be used to store all our playbooks files and we name it playbooks. `mkdir playbooks`
+
+iv. We also create a directory that will be used to keep our hosts organised and we name this inventory.    `mkdir inventory`
+<img width="722" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/78374dd5-ca63-4981-98b8-1285152bd229">
+
+v. Within the playbooks folder, we create our first playbook and name it common.yml: `touch common.yml`
+<img width="722" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/7d66dfa4-37a5-4917-b35a-7bda81d1ab46">
+
+vi. And within the inventory folder, we create dev.yml, prod.yml, staging.yml and uat.yml for development, production, staging and user acceptance testing environments respectively. `cd inventory`    `touch dev.yml`    `touch prod.yml`    `touch staging.yml`    `touch uat.yml`
+<img width="713" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/7a8672cd-4294-4c1a-b22d-1104fd6d96c4">
+
+**Step 2: Setting up Ansible Inventory**
+
+An Ansible inventory file defines the hosts and groups of hosts upon which commands, modules, and tasks in a playbook operate. Since our intention is to execute Linux commands on remote hosts, and ensure that it is the intended configuration on a particular server that occurs, it is important to have a way to organize our hosts in such an inventory. We shall save the below inventory structure in the inventory/dev file to start configuring our development servers. We will also ensure to replace the IP addresses according to our own setup.
+
+i. Ansible uses TCP port 22 by default, which means it needs to ssh into target servers from the Jenkins-Ansible host. For this, we implement the concept of ssh-agent. To install and configure Openssh server and agent for Windows 11, we follow these [instructions.](https://windowsloop.com/install-openssh-server-windows-11/).
+
+ii. Next, we need to enable the ssh agent for the current session: `eval `ssh-agent -s``
+<img width="727" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/965d6358-31ae-4bb7-b294-fec9639cb4d4">
+
+iii. Then we import our key into ssh-agent by executing the following command: `ssh-add <path-to-private-key>`  (ssh -add C:\Users\Kaamil\Downloads\server.pem)
+
+iv. Afterwards, we confirm the key has been added with the command below:    `ssh-add -l`
+<img width="729" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/39435032-20fd-4379-b90e-ccacf18aa934">
+
+v. Now we proceed to ssh into our Jenkins-Ansible server using the ssh-agent:    'ssh -A ubuntu@public-ip' (ssh -A ubuntu@13.49.9.69)
+<img width="720" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/4a12415e-043a-4743-bcf3-90685cdef6a7">
+
+vi. Then we update our inventory/dev.yml file with the following lines of code:
+
+```
+[nfs]
+<NFS-Server-Private-IP-Address> ansible_ssh_user=ec2-user
+
+[webservers]
+<Web-Server1-Private-IP-Address> ansible_ssh_user=ec2-user
+<Web-Server2-Private-IP-Address> ansible_ssh_user=ec2-user
+
+[db]
+<Database-Private-IP-Address> ansible_ssh_user=ec2-user 
+
+[lb]
+<Load-Balancer-Private-IP-Address> ansible_ssh_user=ubuntu
+
+```
+<img width="710" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/4c22890d-0e89-44ca-b8ed-a9b509ab47fe">
 
 
