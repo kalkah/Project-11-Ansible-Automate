@@ -513,4 +513,46 @@ viii. For further confirmation we go to the terminal for the Jenkins-Ansible ser
 Now, it is time to execute the ansible-playbook command and verify if our playbook actually works. We proceed by implementing the following steps:
 
 i. We connect to our Jenkins-Ansible server via VScode:    `$ ssh -A ubuntu@13.49.9.69`
+<img width="720" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/0ebd0178-8291-4d0b-a3f6-0da578f74653">
+
+ii. Then we change to the ansible-config-mgt directory and we run our ansible-playbook with the following command:
+
+`$ cd ansible-config-mgt`  `git pull`  `$ ansible-playbook -i inventory/dev.yml playbooks/common.yml`
+
+<img width="722" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/7d122ffd-9457-409c-9805-5bcb7afa1ee5">
+
+The ansible-playbook run succefully except for the database server. The error in the inventory file for the db was corrected. `ansible_ssh_user=ec2-ubuntu` instead of `ansible_ssh_user=ubuntu`
+
+<img width="719" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/cb3b0f19-cdff-494f-86fb-a04a71777875">
+<img width="712" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/ad7022aa-09e8-4ddd-8ffa-41a5c8d45a14">
+
+The image below show the output after the error is corrected
+<img width="896" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/d0b26098-a536-4afe-b7be-1f64afdf3b26">
+
+iii. As shown in the output image above, the ansible-playbook ran successfully and deployed wireshark on all the servers specified in the playbook. However, for further confirmation, we go to each one of our servers and we run the following commands:    `$ which wireshark`    `$ wireshark --version`
+
+iv. The output images below reflect that our playbook deployed wireshark on the Load Balancer, NFS server, DB Server, and Web Servers 1 and 2.
+
+<img width="662" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/d89f26d0-46d8-449d-9dc7-f634789a162e">
+
+<img width="481" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/45daeba7-8307-44a9-94cb-8f3e7de89d07">
+
+<img width="661" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/297c93c4-4d55-4078-acb7-9bdb817377b5">
+
+<img width="498" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/2e106a61-e197-4841-932d-88a84c711536">
+
+<img width="458" alt="image" src="https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/0cc099de-19d2-417b-8ad0-b9e00a0967af">
+
+### Conclusion
+We have been able to successfuly automate routine tasks by completing the implementation of our first Ansible project and our setup looks somewhat like what we have in the image below.
+
+![image](https://github.com/kalkah/Project-11-Ansible-Automate/assets/95209274/47aef989-cded-4e4d-8fb0-1ab2b9dac892)
+
+The goal of this project was to demonstrate Ansible's powerful automation capabilities and we have been able to do just that. We began the project by installing and setting up Jenkins which we would be using for running build jobs. And then in GitHub, we created a new repository **`ansible-config-mgt`**. After this, we installed and configured Ansible (on the same server as Jenkins) to serve as a Jump Server/Bastion Host. Next, we created a freestyle job and also used GitHub webhooks to configure a Jenkins build job to archive content to a our **`ansible-config-mgt`** repository any time there are changes. 
+
+With our server's new status as a **`Jenkins-Ansible`** instance, we made sure to create and allocate an Elastic IP address to it so that everytime we stop/start the server, there will be no need to keep reconfiguring Github Web Hooks to a new IP address. The next step was to configure Jenkins to connect via SSH and copy files to the /mnt/opt directory in the NFS server we deployed for the [Tooling Website Solution.](https://github.com/kalkah/Project-8)) Subsequently, to get our set up to the desired state, we needed to deploy a load balancer to distribute traffic across our web servers. Our next step involved preparing Visual Studio Code (VSC) as our development environment. We successfully installed and configured VS Code and then we cloned down our **`ansible-config-mgt`** repository to the **`Jenkins-Ansible`** server.
+
+The final phase of this project was where we commenced Ansible Development. We created our playbook directory with the **`common.yml`** file inside it and then our inventory directory along with the relevant files for development, staging, testing and production. Next, we set up the Ansible inventory file to define the hosts and groups of hosts upon which the commands and tasks in the playbook would operate. We then proceeded to create a playbook to give Ansible the instructions on what we need to be performed on all servers listed in the Ansible inventory. After this, we pushed all the changes we made locally to our GitHub repository to ensure GIT remains updated with the latest code. We did this by creating a pull request and merging the code changes to the **`main`** branch. To complete the project, we set up VS Code to connect to our instance via SSH and we ran our playbook. Afterwards, we were able to confirm that the playbook task (which was to install the latest version of **`wireshark`** on all the servers specified in the inventory file) was carried out successfully. Thank you.
+
+
 
